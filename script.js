@@ -113,11 +113,47 @@ document.querySelectorAll('.feature-card').forEach(card => {
 
 // Form submission handling
 const form = document.querySelector('.contact-form');
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = form.querySelector('input[type="email"]').value;
-    alert('Thanks for joining our waitlist! We\'ll be in touch soon.');
-    form.reset();
+    const submitButton = form.querySelector('.submit-button');
+    const originalButtonText = submitButton.textContent;
+    
+    try {
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+
+        // Encode the data as URL parameters
+        const params = new URLSearchParams({
+            email: email,
+            timestamp: new Date().toISOString()
+        });
+
+        console.log('Sending request with params:', params.toString());
+
+        // REPLACE THIS URL WITH YOUR NEW WEB APP URL
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbxpUJtWRT1Vt_ocbFUKsm0yVLSJJZkU3cS48WAbVvN2PNznHQUiRoc3FFgZx8z9A1WZ/exec?${params.toString()}`, {
+            method: 'GET',
+            mode: 'no-cors',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+
+        // Add a small delay to ensure the data is processed
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        alert('Thanks for joining our waitlist! We\'ll be in touch soon.');
+        form.reset();
+    } catch (error) {
+        console.error('Detailed error:', error);
+        alert('Sorry, there was an error submitting your email. Please try again.');
+    } finally {
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+    }
 });
 
 // Add particle effect to hero section
